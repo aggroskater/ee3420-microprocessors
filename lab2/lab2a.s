@@ -24,4 +24,29 @@
 
 #INCLUDE ../HC12TOOLS.INC
 
+	ORG $1000
 
+STR_NAME	DS.B 80		; User's name.
+INT_SUM		DS.B 1		; Sum of user's name's ascii codes.
+NEWLINE		DC.B CR,LF,NULL ; newline.
+PROMPT_GETNAME	DC.B "Please input username",CR,LF,NULL 
+OUTPUT_NAME	DC.B "Hello %s, the sum of all the ASCII codes in your name is %i.",CR,LF,NULL
+OUTPUT_LUCKY	DC.B "Your lucky number is %i."
+
+	ORG $2000
+
+MAIN:
+	LIBRARY_VERSION
+
+	PUTS_SCI0 #PROMPT_GETNAME
+	GETS_SCI0 #STR_NAME
+
+	JSR SUMOF
+
+	PRINTF_DBUG12 #OUTPUT_NAME, #STR_NAME, #INT_SUM
+	RTS
+
+SUMOF:
+
+	DBNE 	
+	RTS
