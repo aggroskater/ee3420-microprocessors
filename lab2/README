@@ -1,0 +1,13 @@
+Lab 2
+=====
+
+This lab has us utilizing many of the macros and subroutines that Dr. Stapleton 
+provided for us to use.
+
+Compiling
+=========
+
+    $ ../asm12 -l lab2-sample.s
+
+Should provide you with a listing file and an .s19 file that you can upload 
+to the board via minicom or any other terminal emulator.
