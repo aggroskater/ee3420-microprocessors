@@ -1,0 +1,20 @@
+To install the MC9S12 FLASH Library (10/23/2010 version):
+
+1. Make certain that you have the correct library version for the board and OS you are using.
+	- e.g. for the Dragon12-Plus using D-Bug12 the file is "FLASH_LIBRARY_DRAGON12PLUS_DBUG12.S29" 
+	
+2. Connect either a dedicated background debugging module (BDM) or a second board in BDM Pod mode to the "BDM IN" port of the target board.
+
+3. Start a Terminal emulator program (e.g. HyperTerminal or MiniIDE) and connect to the BDM.  Connect the BDM to the target board.  You should get either an "S>" or "R>" prompt.  If the prompt is "R>" type "RESET" to stop the target board and the prompt should change to "S>".
+
+4. Check the file "EE3420.INC" for the variable LIBRARY_PAGE.  This is the PPAGE where the FLASH Library is to be located.
+	- e.g. for the Dragon12-Plus using D-Bug12 the LIBRARY_PAGE is $3D
+	
+5. Clear the portion of FLASH memory that will hold the FLASH Library using the FSERASE command through the BDM.
+	- e.g. if the LIBRARY PAGE is $3D then the command "FSERASE 3D:8000 3D:BFFF" will erase all of PPAGE $3D.  Remember PPAGE offsets are always in the range $8000-$BFFF.
+	
+6. Load the appropriate S-record file using FLOAD.  Type "FLOAD" then select the text file upload and the ".S29" file identified in step #1.
+	- under HyperTerminal this is "Transfer -> Send Text File ..."
+	- under MiniIDE this is "Terminal -> Download File ..."
+	
+7. At the beginning of your programs, add the line "#INCLUDE EE3420.INC" to utilize the MACRO definitions that locate all of the FLASH Library functions for you and pass parameters in the appropriate order and format.	

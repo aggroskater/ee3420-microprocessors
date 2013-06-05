@@ -11,9 +11,9 @@ However, the subroutines themselves remained the same as far as I know. Dr.
 Stapleton flashed all of the boards used in class via the two-board POD set up.
 I have provided what I believe to be a relatively recent version of the flash
 .s29 file that may or may not work for anyone who trys to program the flash
-memory with it. It is located in this directory as:
+memory with it. It is located at: 
 
-    Dragon12-Plus_FLASH_Image_01-16-2013.s29
+    flash-library/Dragon12-Plus_FLASH_Image_01-16-2013.s29
 
 Assuming you can successfully program the flash memory for your particular 
 development board, then all of the macros utilized in this course (like GETS, 
