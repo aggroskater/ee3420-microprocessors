@@ -27,7 +27,8 @@
 	ORG $1000
 
 STR_NAME	DS.B 80		; User's name.
-INT_SUM		DS.B 1		; Sum of user's name's ascii codes.
+INT_SUM		DS.W 1		; Sum of user's name's ascii codes.
+STR_SUM		DS.B 10		; string format of sum
 NEWLINE		DC.B CR,LF,NULL ; newline.
 PROMPT_GETNAME	DC.B "Please input username",CR,LF,NULL 
 OUTPUT_NAME	DC.B "Hello %s, the sum of all the ASCII codes in your name is %i.",CR,LF,NULL
@@ -36,6 +37,7 @@ OUTPUT_LUCKY	DC.B "Your lucky number is %i."
 	ORG $2000
 
 MAIN:
+
 	LIBRARY_VERSION
 
 	PUTS_SCI0 #PROMPT_GETNAME
@@ -43,10 +45,31 @@ MAIN:
 
 	JSR SUMOF
 
-	PRINTF_DBUG12 #OUTPUT_NAME, #STR_NAME, #INT_SUM
+	PRINTF_DBUG12 #OUTPUT_NAME, #STR_NAME, INT_SUM
+	PUTS_SCI0 #NEWLINE
+	ITOA INT_SUM,#STR_SUM
+	PUTS_SCI0 #STR_SUM
+	PUTS_SCI0 #NEWLINE
+	LDD INT_SUM
 	RTS
 
 SUMOF:
 
-	DBNE 	
+	LDX #0
+	LDD #0
+	STD INT_SUM
+	LDAA #NULL
+	CMPA STR_NAME,X	; check that we don't have null terminator right off the bat
+	BNE LOOP
+	RTS
+
+LOOP:
+
+	LDD INT_SUM
+	ADDB STR_NAME,X
+	INX
+	STD INT_SUM
+	LDAA #NULL
+	CMPA STR_NAME,X ; is next char null terminator? if so, leave loop.
+	BNE LOOP
 	RTS
