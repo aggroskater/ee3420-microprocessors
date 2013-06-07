@@ -27,6 +27,7 @@
 	ORG $1000
 
 STR_NAME	DS.B 80		; User's name.
+SCRATCH		DS.W 1		; Scratch pad for arithmetic
 INT_SUM		DS.W 1		; Sum of user's name's ascii codes.
 STR_SUM		DS.B 10		; string format of sum
 NEWLINE		DC.B CR,LF,NULL ; newline.
@@ -56,8 +57,7 @@ MAIN:
 SUMOF:
 
 	LDX #0
-	LDD #0
-	STD INT_SUM
+	STX INT_SUM	; Initialize sum to zero
 	LDAA #NULL
 	CMPA STR_NAME,X	; check that we don't have null terminator right off the bat
 	BNE LOOP
@@ -66,9 +66,10 @@ SUMOF:
 LOOP:
 
 	LDD INT_SUM
-	ADDB STR_NAME,X
-	INX
+	ADDB STR_NAME,X	
+	ADCA #0	
 	STD INT_SUM
+	INX
 	LDAA #NULL
 	CMPA STR_NAME,X ; is next char null terminator? if so, leave loop.
 	BNE LOOP
