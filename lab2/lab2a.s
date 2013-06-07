@@ -27,7 +27,6 @@
 	ORG $1000
 
 STR_NAME	DS.B 80		; User's name.
-SCRATCH		DS.W 1		; Scratch pad for arithmetic
 INT_SUM		DS.W 1		; Sum of user's name's ascii codes.
 STR_SUM		DS.B 10		; string format of sum
 NEWLINE		DC.B CR,LF,NULL ; newline.
