@@ -1,4 +1,4 @@
-; vim: set filetype=asmhc12:                                                                                                     
+; vim: set filetype=asmhc12:
 
 ; This program has us using some of the macros provided by Dr. Stapleton.
 
@@ -46,10 +46,10 @@ MAIN:
 	JSR SUMOF
 
 	PRINTF_DBUG12 #OUTPUT_NAME, #STR_NAME, INT_SUM
-	PUTS_SCI0 #NEWLINE
-	ITOA INT_SUM,#STR_SUM
-	PUTS_SCI0 #STR_SUM
-	PUTS_SCI0 #NEWLINE
+;	PUTS_SCI0 #NEWLINE
+;	ITOA INT_SUM,#STR_SUM
+;	PUTS_SCI0 #STR_SUM
+;	PUTS_SCI0 #NEWLINE
 	LDD INT_SUM
 	RTS
 
