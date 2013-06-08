@@ -89,9 +89,11 @@ LOOP1:
 LUCKY:
 
 	LDY #0
+	STY INT_LUCKY	; Initialize lucky to zero
 	LDD INT_SUM
 	LDX #20
 	EDIV
 	STD INT_LUCKY
-	INC INT_LUCKY
+	LDX #1
+	INC INT_LUCKY,X
 	RTS
