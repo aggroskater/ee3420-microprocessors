@@ -23,6 +23,9 @@ PROMPT_FAIL	DC.B "Try again. Input not a number or too big.",CR,LF,NULL
 BAD		DC.B "Bad input is %s",CR,LF,NULL
 INPUT		DC.B "You entered %s",CR,LF,NULL
 PASS		DC.B "Input valid.",CR,LF,NULL
+INCHECK		DC.B "In check subr.",CR,LF,NULL
+INFAIL		DC.B "In fail subr.",CR,LF,NULL
+INFOUND		DC.B "In found subr.",CR,LF,NULL
 
 	ORG $2000
 
@@ -42,16 +45,21 @@ GET_SEED1:
 	PUTS_SCI0 #PROMPT_SEED1
 	GETS_SCI0 #STR_SEED1
 
+	LDX #0
 	JSR CHECK_SEED1
 
 CHECK_SEED1:
 
-	LDX #0
-	LDAA #57
-	CMPA STR_SEED1,X
+	PUTS_SCI0 #INCHECK
+;	LDAA #58
+;	CMPA STR_SEED1,X
+	LDAA STR_SEED1,X
+	CMPA #58
 	BHI FAIL1		; char too big. failed.
-	LDAA #48
-	CMPA STR_SEED1,X
+;	LDAA #47
+;	CMPA STR_SEED1,X
+	LDAA STR_SEED1,X
+	CMPA #47
 	BLO FAIL1		; char too small. either invalid or null.
 	INX
 	CPX #10
@@ -60,6 +68,7 @@ CHECK_SEED1:
 	
 FAIL1:
 
+	PUTS_SCI0 #INFAIL
 	LDAA #NULL
 	CMPA STR_SEED1,X
 	BEQ FOUND_TERMINATOR	; found terminator. not an invalid char.
@@ -70,8 +79,9 @@ FAIL1:
 
 FOUND_TERMINATOR:
 
+	PUTS_SCI0 #INFOUND
 	CPX #0			; check for no-input
-	BNE PASSED1		; found null terminator. wasn't first char. 
+	LBNE PASSED1		; found null terminator. wasn't first char. 
 	RTS			; It WAS first char. user didn't input anything.
 
 
