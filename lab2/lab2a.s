@@ -77,10 +77,10 @@ SUMOF:
 
 LOOP1:
 
-	LDD INT_SUM
-	ADDB STR_NAME,X	
-	ADCA #0	
-	STD INT_SUM
+	LDD INT_SUM	; load sum from memory
+	ADDB STR_NAME,X ; add the byte to int_sum	
+	ADCA #0		; pick up the carry if we hit it	
+	STD INT_SUM	; store new sum back into memory
 	INX
 	LDAA #NULL
 	CMPA STR_NAME,X ; is next char null terminator? if so, leave loop.
