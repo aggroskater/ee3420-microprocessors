@@ -1,0 +1,75 @@
+>load                                                                          
+                                                                               
+>                                                                              
+>call 2000                                                                     
+                                                                               
+HC12TOOLS - MC9S12 FLASH LIBRARY - REVISION 02/13/2013                         
+COPYRIGHT 2013 WILLIAM STAPLETON                                               
+THIS FILE MAY BE FREELY DISTRIBUTED AS LONG AS IT REMAINS UNCHANGED AND FULLY CD
+DEVELOPED AT TEXAS STATE UNIVERSITY - SAN MARCOS, INGRAM SCHOOL OF ENGINEERING 
+PLEASE REPORT BUGS TO WS20@TXSTATE.EDU                                         
+                                                                               
+Please input username                                                          
+Hello preston, the sum of all the ASCII codes in your name is 779.             
+Your lucky number is 20.                                                       
+Subroutine Call Returned                                                       
+                                                                               
+PP  PC    SP    X     Y    D = A:B   CCR = SXHI NZVC                           
+38 2000  3C00  0001  10DD     00:13        1001 0000                           
+xx:2000  4A81FC3D      CALL  $81FC,$3D                                         
+
+>load                                                                          
+
+>
+>call 2000
+
+HC12TOOLS - MC9S12 FLASH LIBRARY - REVISION 02/13/2013
+COPYRIGHT 2013 WILLIAM STAPLETON
+THIS FILE MAY BE FREELY DISTRIBUTED AS LONG AS IT REMAINS UNCHANGED AND FULLY CD
+DEVELOPED AT TEXAS STATE UNIVERSITY - SAN MARCOS, INGRAM SCHOOL OF ENGINEERING
+PLEASE REPORT BUGS TO WS20@TXSTATE.EDU
+
+Please input first seed, less than 2^16.
+Bad input is fresrf
+Please input first seed, less than 2^16.
+Bad input is 
+Please input first seed, less than 2^16.
+Bad input is fsafwaefwaefwafwaef
+Please input first seed, less than 2^16.
+Input valid.
+Please input second seed, less than 2^16.
+Bad input is 0
+Please input second seed, less than 2^16.
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+55
+89
+144
+233
+377
+610
+987
+1597
+2584
+4181
+6765
+10946
+17711
+28657
+46368
+Subroutine Call Returned
+
+PP  PC    SP    X     Y    D = A:B   CCR = SXHI NZVC
+38 2000  3C00  6FF1  000A     25:11        1001 0001
+xx:2000  4A81FC3D      CALL  $81FC,$3D            
+
+>
+
