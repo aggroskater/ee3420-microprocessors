@@ -33,24 +33,25 @@ MAIN:
 
 	LIBRARY_VERSION
 
-	JSR GET_SEED1
+	JMP GET_SEED1
 
 PASSED1:
 
 	PUTS_SCI0 #PASS
 	ATOI #STR_SEED1,INT_SEED1
-	JSR GET_SEED2
+	JMP GET_SEED2
 
 PASSED2:
 
 	JSR OUTPUT
+	RTS
 
 GET_SEED2:
 
 	PUTS_SCI0 #PROMPT_SEED2
 	GETS_SCI0 #STR_SEED2
 	LDX #0
-	JSR CHECK_SEED2
+	JMP CHECK_SEED2
 
 CHECK_SEED2:
 
@@ -63,7 +64,7 @@ CHECK_SEED2:
 	INX
 	CPX #10
 	BEQ FAIL3
-	JSR CHECK_SEED2
+	JMP CHECK_SEED2
 
 FAIL3:
 
@@ -74,13 +75,13 @@ FAIL3:
 FAIL4:
 
 	PRINTF_DBUG12 #BAD, #STR_SEED2
-	JSR GET_SEED2	
+	JMP GET_SEED2	
 
 FOUND_TERMINATOR2:
 
 	CPX #0
 	BNE DIFFCHECK		; not empty string. check not equal to seed1.
-	JSR FAIL4		; empty string. try again.
+	JMP FAIL4		; empty string. try again.
 
 DIFFCHECK:
 
@@ -88,7 +89,7 @@ DIFFCHECK:
 	LDY INT_SEED2
 	CMPY INT_SEED1
 	BEQ FAIL4
-	JSR PASSED2
+	JMP PASSED2
 
 GET_SEED1:
 
@@ -96,7 +97,7 @@ GET_SEED1:
 	GETS_SCI0 #STR_SEED1
 
 	LDX #0
-	JSR CHECK_SEED1
+	JMP CHECK_SEED1
 
 CHECK_SEED1:
 
@@ -114,7 +115,7 @@ CHECK_SEED1:
 	INX
 	CPX #10
 	BEQ FAIL1		; never found null-terminator. input too large.
-	JSR CHECK_SEED1
+	JMP CHECK_SEED1
 	
 FAIL1:
 
@@ -126,14 +127,14 @@ FAIL2:
 ;	PUTS_SCI0 #PROMPT_FAIL
 	PRINTF_DBUG12 #BAD, #STR_SEED1
 	LDAB STR_SEED1,X
-	JSR GET_SEED1
+	JMP GET_SEED1
 
 FOUND_TERMINATOR1:
 
 ;	PUTS_SCI0 #INFOUND
 	CPX #0			; check for no-input
 	LBNE PASSED1		; found null terminator. wasn't first char. 
-	JSR FAIL2		; It WAS first char. user didn't input anything.
+	JMP FAIL2		; It WAS first char. user didn't input anything.
 
 OUTPUT:
 
