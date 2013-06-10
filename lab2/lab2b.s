@@ -21,11 +21,7 @@ PROMPT_SEED1	DC.B "Please input first seed, less than 2^16.",CR,LF,NULL
 PROMPT_SEED2	DC.B "Please input second seed, less than 2^16.",CR,LF,NULL
 PROMPT_FAIL	DC.B "Try again. Input not a number or too big.",CR,LF,NULL
 BAD		DC.B "Bad input is %s",CR,LF,NULL
-INPUT		DC.B "You entered %s",CR,LF,NULL
 PASS		DC.B "Input valid.",CR,LF,NULL
-INCHECK		DC.B "In check subr.",CR,LF,NULL
-INFAIL		DC.B "In fail subr.",CR,LF,NULL
-INFOUND		DC.B "In found subr.",CR,LF,NULL
 
 	ORG $2000
 
@@ -162,59 +158,3 @@ LOOP:
 	BRA LOOP
 ESCAPE:
 	RTS
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;	JSR SUMOF
-
-;	PRINTF_DBUG12 #OUTPUT_NAME, #STR_NAME, INT_SUM
-
-;	PUTS_SCI0 #NEWLINE
-;	ITOA INT_SUM,#STR_SUM
-;	PUTS_SCI0 #STR_SUM
-;	PUTS_SCI0 #NEWLINE
-;	LDD INT_SUM
-
-;	JSR LUCKY
-
-;	PRINTF_DBUG12 #OUTPUT_LUCKY, INT_LUCKY
-
-;	PUTS_SCI0 #NEWLINE
-;	ITOA INT_LUCKY,#STR_LUCKY
-;	PUTS_SCI0 #STR_LUCKY
-;	PUTS_SCI0 #NEWLINE
-
-;	RTS
-
-;SUMOF:
-
-;	LDX #0
-;	STX INT_SUM	; Initialize sum to zero
-;	LDAA #NULL
-;	CMPA STR_NAME,X	; check that we don't have null terminator right off the bat
-;	BNE LOOP1
-;	RTS
-
-;LOOP1:
-
-;	LDD INT_SUM
-;	ADDB STR_NAME,X	
-;	ADCA #0	
-;	STD INT_SUM
-;	INX
-;	LDAA #NULL
-;	CMPA STR_NAME,X ; is next char null terminator? if so, leave loop.
-;	BNE LOOP1
-;	RTS
-
-;LUCKY:
-
-;	LDY #0
-;	STY INT_LUCKY	; Initialize lucky to zero
-;	LDD INT_SUM
-;	LDX #20
-;	EDIV
-;	STD INT_LUCKY
-;	LDX #1
-;	INC INT_LUCKY,X
-;	RTS
