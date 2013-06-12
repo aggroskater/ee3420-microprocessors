@@ -19,7 +19,7 @@
 INT_A		DS.W 2		; int a 
 INT_B		DS.W 2		; int b
 NEWLINE		DC.B CR,LF,NULL ; newline.
-OUTPUT		DC.B "The sum is %s",CR,LF,NULL
+OUTPUT1		DC.B "In ADD32",CR,LF,NULL
 
 	ORG $2000
 
@@ -51,8 +51,9 @@ MAIN:
 
 ADD32:
 
-	LDX INT_A
-	LDY INT_B
+	PUTS_SCI0 #OUTPUT1
+	LDX #INT_A
+	LDY #INT_B
 		
 	LDD 2,X
 	ADDD 2,Y
