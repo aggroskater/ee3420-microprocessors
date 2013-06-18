@@ -45,9 +45,9 @@ FINISHEDOUT	DC.B "Overflow and Carry checks complete.",CR,LF,NULL
 MAIN:
 
 	LDX #0
-	LDD #$FFFF
+	LDD #$0000
 	STD INT_A,X
-	LDD #$FFFF
+	LDD #$0004
 	INX
 	INX
 	STD INT_A,X
@@ -55,7 +55,7 @@ MAIN:
 	DEX
 	LDD #$FFFF
 	STD INT_B,X
-	LDD #$FFFF
+	LDD #$FFFC
 	INX
 	INX
 	STD INT_B,X
