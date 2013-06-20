@@ -18,28 +18,7 @@
 
 INT_A		DS.W 2		; int a 
 INT_B		DS.W 2		; int b
-INT_SP		DS.W 1		; stack pointer address
-STR_SP		DS.B 10		; stack pointer address as string.
-INT_CCR		DS.B 2
-STR_CCR		DS.B 10
-NEWLINE		DC.B CR,LF,NULL ; newline.
-OUTPUT1		DC.B "In ADD32",CR,LF,NULL
-CAR1		DC.B "In Carry 1",CR,LF,NULL
-CAR0		DC.B "In Carry 0",CR,LF,NULL
-NEGSET		DC.B "IN NEG SET",CR,LF,NULL
-NEGCLEAR	DC.B "IN NEG CLEAR",CR,LF,NULL
-ZEROHIGH	DC.B "IN ZERO HIGH",CR,LF,NULL
-ZEROLOW		DC.B "IN ZERO LOW",CR,LF,NULL
-ZEROSET		DC.B "IN ZERO SET",CR,LF,NULL
-ZEROCLEAR	DC.B "IN ZERO CLEAR",CR,LF,NULL
-DEBUG1		DC.B "MADE IT OUT OF NBIT CHECKS",CR,LF,NULL
-DEBUG2		DC.B "ABOUT TO RTS FROM NEG_BIT_CLEAR",CR,LF,NULL
-NEXT0LABEL	DC.B "Hit next0.",CR,LF,NULL
-VCLEAR		DC.B "Overflow not found. Clearing V.",CR,LF,NULL
-VSET		DC.B "Overflow found. Setting V.",CR,LF,NULL
-CHECKV		DC.B "Original operands were same sign. Checking overflow.",CR,LF,NULL
-FINISHEDOUT	DC.B "Overflow and Carry checks complete.",CR,LF,NULL
-
+	
 	ORG $2000
 
 MAIN:
@@ -60,228 +39,175 @@ MAIN:
 	INX
 	STD INT_B,X
 
-	JSR ADD32
-	; carry appropriately set at this point
+	JSR ADD32	; carries out actual addition routine
 
-	; check neg
+	BRSET INT_A,#%10000000,N_BIT_SET	; check if MSB of sum is set.
 
-	BRSET INT_A,#%10000000,N_BIT_SET
 R_N_BIT_SET:
-	BRCLR INT_A,#%10000000,N_BIT_CLEAR
+
+	BRCLR INT_A,#%10000000,N_BIT_CLEAR	; check if MSB of sum is clear.
+
 R_N_BIT_CLEAR:
 
-	; neg appropriately set
+	JSR Z_BIT_CHECK_HIGH	; check to see if sum is zero.
 
-	; check zero
-
-;	PUTS_SCI0 #DEBUG1
-
-	JSR Z_BIT_CHECK_HIGH
 R_Z_BIT_CHECK:
-	; zero appropriately set
 
-	; check overflow
-
-	RTS
+	RTS			; Subroutine is finished.
 
 N_BIT_SET:
 
-;	PUTS_SCI0 #NEGSET
-;	LDAA #0
-	TFR CCR,A
+	TFR CCR,A		; put CCR onto stack so we don't lose state.
 	PSHA
-	BSET 0,SP,#%00001000
+	BSET 0,SP,#%00001000	; set N bit.
 	PULA
-	TFR A,CCR
-;	RTS
+	TFR A,CCR		; restore CCR with Zero bit set.
 	JMP R_N_BIT_SET
 
 N_BIT_CLEAR:
 
-;	PUTS_SCI0 #NEGCLEAR
-;	LDAA #0
-	TFR CCR,A
+	TFR CCR,A		; put CCR onto stack. Don't want to lose state.
 	PSHA
-	BCLR 0,SP,#%00001000
+	BCLR 0,SP,#%00001000	; clear N bit.
 	PULA
-	TFR A,CCR
-;	PUTS_SCI0 #DEBUG2
-;	RTS
+	TFR A,CCR		; restore CCR
 	JMP R_N_BIT_CLEAR
 
 Z_BIT_CHECK_HIGH:
 
-;	PUTS_SCI0 #ZEROHIGH
-	TFR CCR,A
+	TFR CCR,A		; put CCR onto stack.
 	PSHA
-	LDD 0,X
+	LDD 0,X			; compare top half of sum to zero.
 	CPD #0
-	BEQ Z_BIT_CHECK_LOW
+	BEQ Z_BIT_CHECK_LOW	; top half is zero. check bottom.
 	CPD #0
-	BNE Z_BIT_CLEAR
-;	RTS
+	BNE Z_BIT_CLEAR		; top half isn't zero. Clear Z bit.
 
 Z_BIT_CHECK_LOW:
 
-;	PUTS #ZEROLOW
-	LDD 2,X
+	LDD 2,X			; compare bottom half of sum to zero.
 	CPD #0
-	BEQ Z_BIT_SET
+	BEQ Z_BIT_SET		; bottom half also zero. Set Z bit.
 	CPD #0
-	BNE Z_BIT_CLEAR
-;	RTS
+	BNE Z_BIT_CLEAR		; bottom half not zero. Clear Z bit.
 
 Z_BIT_SET:
 
-;	PUTS #ZEROSET
-	BSET 0,SP,#%00000100
+	BSET 0,SP,#%00000100	; recall CCR already on stack. Set Z bit.
 	PULA
-	TFR A,CCR
-;	RTS
+	TFR A,CCR		; restore CCR
 	JMP R_Z_BIT_CHECK
 
 Z_BIT_CLEAR:
 
-;	PUTS #ZEROCLEAR
-	BCLR 0,SP,#%00000100
+	BCLR 0,SP,#%00000100	; recall CCR already on stack. Clear Z bit.
 	PULA
-	TFR A,CCR
-;	RTS
+	TFR A,CCR		; restore CCR
 	JMP R_Z_BIT_CHECK
-
-;V_BIT:
-
-
 
 ADD32:
 
-	PUTS_SCI0 #OUTPUT1
-	LDX #INT_A
-	LDY #INT_B
+	LDX #INT_A		; Load address of INT_A to X
+	LDY #INT_B		; Load address of INT_B to X
 
-	LDAA 0,X
-	LDAB 0,Y
+	LDAA 0,X		; Load top byte of INT_A to A
+	LDAB 0,Y		; Load top byte of INT_B to B
 	
-	ANDA #%10000000
-	ANDB #%10000000
+	ANDA #%10000000		; Get the MSB for INT_A
+	ANDB #%10000000		; Get the MSB for INT_B
 
-;	JSR OUTPUTSP
+	PSHA			; store MSB of INT_A onto stack.
+	PSHB			; store MSB of INT_B onto stack.
+				; we use these for figuring out V flag later.
 
-	PSHA
-	PSHB
-
-;	JSR OUTPUTSP
-
-	LDD 2,X
+	LDD 2,X			; Begin addition routine. Add lower half.
 	ADDD 2,Y
-	LBCS CARRY1
-	STD 2,X	
+	LBCS CARRY1		; If carry was set, need to add 1 to upper half.
+	STD 2,X			; carry not set, store lower half result.
 NEXT1:
-	LDD 0,X
+	LDD 0,X			; Add upper half
 	ADDD 0,Y
-	LBCS CARRY0
+	LBCS CARRY0		; If carry was set, need to set carry bit.
 	STD 0,X	
 NEXT0:
-;	PUTS_SCI0 #NEXT0LABEL
 
-;	JSR OUTPUTSP
-
-	TFR CCR,A
+	TFR CCR,A		; Addition complete. C bit set appropriately.
+				; Need to put CCR onto stack and inspect V bit.
 	PSHA
 
-;	JSR OUTPUTSP
+	LDAA 2,SP		; XOR MSB of original two numbers. If zero,
+				; both were same sign. Need to check for
+				; overflow.
+	EORA 1,SP		
+	PSHA			; push result of EOR onto stack.
 
-	LDAA 2,SP
-	EORA 1,SP
-	PSHA
-	BRCLR 0,SP,#%10000000,CHECK_V
-	BRA V_CLEAR
+	BRCLR 0,SP,#%10000000,CHECK_V	; Original numbers were same sign. Check
+					; for overflow
+	BRA V_CLEAR			; Original numbers were opposite sign.
+					; No overflow possible. Clear V.
 	
 CHECK_V:
-	PUTS_SCI0 #CHECKV
-	PULA
-	LDAA 2,SP
+
+	PULA				; get rid of EOR result. Don't need it.
+	LDAA 2,SP			; compare MSB of original with sum.
 	EORA 0,X
 	PSHA
-	BRSET 0,SP,#%10000000,V_SET
-	BRA V_CLEAR
+	BRSET 0,SP,#%10000000,V_SET	; if original and sum are different, 
+					; we have overflow. Set V bit.
+	BRA V_CLEAR			; No overflow. Clear V bit.
 
 V_CLEAR:
 
-	PUTS_SCI0 #VCLEAR
-	PULA
-	BCLR 0,SP,#%00000010
+	PULA				; Get rid of EOR result. Don't need it.	
+	BCLR 0,SP,#%00000010		; Clear V bit (CCR is on top of stack
+					; at this point)
 	JMP FINISHED
 	
 
 V_SET:
 
-	PUTS_SCI0 #VSET
-	PULA
-;	JSR OUTPUTSP
-	BSET 0,SP,#%00000010
+	PULA				; Get rid of EOR result. Don't need it.
+	BSET 0,SP,#%00000010		; Set V bit of CCR.
 	JMP FINISHED
 
 FINISHED:
 
-	PUTS_SCI0 #FINISHEDOUT
 	PULA			; this should be the CCR
-	TFR A,CCR
-;	JSR OUTPUTCCR
+	TFR A,CCR		; restore CCR
+
 	PULB			; clear MSB info off stack.
 	PULB			; clear MSB info off stack.
-				; at this point, SP should point to rtn. addr.
-;	JSR OUTPUTSP
-;	JSR OUTPUTCCR
-	RTS
+
+	RTS			; at this point, SP points to rtn addr.
 
 CARRY1:
 
-	PUTS_SCI0 #CAR1
-	STD 2,X
-	LDD 0,X
+	STD 2,X			; store result of lower half addition.
+	LDD 0,X			; add one to upper half.
 	ADDD #1
 	BCS BIGOVERFLOW		; the top half of int_a was FFFF
-	STD 0,X
-	JMP NEXT1
+	STD 0,X			; store upper half
+	JMP NEXT1		; proceed to add upper half
 
 BIGOVERFLOW:
 
-	STD 0,X
-	TFR CCR,A
+	STD 0,X			; store 0000 result into top half of sum.
+	TFR CCR,A		; store CCR since it has Carry bit set now.
+				; (STD doesn't affect C bit)
 	PSHA
-	LDD 0,X
+	LDD 0,X			; add top half
 	ADDD 0,Y
 	STD 0,X
 	PULA
-	TFR A,CCR
-	JMP NEXT0
+	TFR A,CCR		; restore CCR
+	JMP NEXT0		; proceed to check V flag.
 
 CARRY0:
 
-	PUTS_SCI0 #CAR0
-	STD 0,X
-;	LDAA #0
-	TFR CCR,A
+	STD 0,X			; store top half result in sum.
+	TFR CCR,A		; save CCR since C bit is now set.
 	PSHA
-	BSET 0,SP,#%00000001
+	BSET 0,SP,#%00000001	; huh. guess I set it forcefully here.
 	PULA
 	TFR A,CCR
-	JMP NEXT0
-
-OUTPUTSP:
-
-	STS INT_SP
-	ITOA_16_FIXED INT_SP,#STR_SP
-	PUTS_SCI0 #STR_SP
-	PUTS_SCI0 #NEWLINE
-	RTS
-
-OUTPUTCCR:
-
-	TFR CCR,D
-	STD INT_CCR
-	ITOA_16_FIXED INT_CCR,#STR_CCR
-	PUTS_SCI0 #STR_CCR
-	PUTS_SCI0 #NEWLINE
-	RTS	
+	JMP NEXT0		; now check for V bit.
