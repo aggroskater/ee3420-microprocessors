@@ -1,0 +1,20 @@
+; vim: set filetype=asmhc12:
+
+#INCLUDE ../HC12TOOLS.INC
+#INCLUDE ../ALU32.INC
+
+	ORG $1000
+
+INT_A_1	DC.W $EFFF,$FFFF
+INT_B_1	DC.W $0000,$0001
+
+	ORG $2000
+
+MAIN:
+
+	LDX #INT_A_1
+	LDY #INT_B_1
+
+	ADD32
+
+	RTS	
