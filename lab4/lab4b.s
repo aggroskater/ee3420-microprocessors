@@ -8,6 +8,12 @@
 
 PROMPT	DC.B "Input digit.",NULL
 INPUT	DS.B 4
+DIGIT_PATTERN 	DC.B $3F,$06,$5B,$4F,$66,$6D,$7D,$07	; 0 1 2 3 4 5 6 7
+		DC.B $7F,$6F,$77,$7C,$39,$5E,$79,$71	; 8 9 a b c d e f
+;KEYPAD_OPTS	DC.B $46,$45,$44,$43,$42,$41,$39,$38	; F E D C B A 9 8
+;		DC.B $37,$36,$35,$34,$33,$32,$31,$30	; 7 6 5 4 3 2 1 0
+KEYPAD_OPTS	DC.B $30,$31,$32,$33,$34,$35,$36,$37	; 0 1 2 3 4 5 6 7
+		DC.B $38,$39,$41,$42,$43,$44,$45,$46	; 8 9 A B C D E F
 
 	ORG $2000
 
@@ -19,14 +25,47 @@ MAIN:
 
 	PUTS_SCI0 #PROMPT
 	PUTS_LCD #PROMPT 
-;	GETC_KEYPAD
-;	PUTC_LCD
-;	STAB INPUT
+
+	LCD_CURSOR 1,0
+
+	LDY #10
+LOOPY:
+
+	GETC_KEYPAD
+	PUTC_LCD
+	STAB INPUT
+
+	LDX #15
+
+SEGFIND:
+
+	CMPB KEYPAD_OPTS,X
+	BEQ DISP
+	DBNE X,SEGFIND
+	
+DISP:
+
+	LDAA DIGIT_PATTERN,X
+	PSHA
+	MOVB 0,SP,PORTB	
+	PULA
+	DBNE Y,LOOPY
 	RTS
 
 
 E_SEGS:
 
-	BCLR DDRP,#%00000001	; Set only rightmost seg to on.
+	;enable leds for now
+;	BSET DDRJ,#%00000010
+;	BCLR PORTJ,#%00000010
+
+	;enable segs
+	BSET DDRB,#%11111111	; set all of port b to output
+
+	BCLR DDRP,#%00001000	; Set P3 to output (rightmost seg)
+	BSET DDRP,#%00000111	; set P0,P1,P2 to input (effectively off)
+	BCLR PORTP,#%00001000	; set rightmost seg jumper to zero, permitting
+				; illumination.
+	MOVB #$79,PORTB		; initial state.
 	BSET PORTJ,#%00000010	; turn off led's
 	RTS
