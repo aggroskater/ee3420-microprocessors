@@ -10,8 +10,6 @@ PROMPT	DC.B "Input digit.",NULL
 INPUT	DS.B 4
 DIGIT_PATTERN 	DC.B $3F,$06,$5B,$4F,$66,$6D,$7D,$07	; 0 1 2 3 4 5 6 7
 		DC.B $7F,$6F,$77,$7C,$39,$5E,$79,$71	; 8 9 a b c d e f
-;KEYPAD_OPTS	DC.B $46,$45,$44,$43,$42,$41,$39,$38	; F E D C B A 9 8
-;		DC.B $37,$36,$35,$34,$33,$32,$31,$30	; 7 6 5 4 3 2 1 0
 KEYPAD_OPTS	DC.B $30,$31,$32,$33,$34,$35,$36,$37	; 0 1 2 3 4 5 6 7
 		DC.B $38,$39,$41,$42,$43,$44,$45,$46	; 8 9 A B C D E F
 
