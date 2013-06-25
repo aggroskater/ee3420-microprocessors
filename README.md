@@ -1,7 +1,7 @@
 ee3420-microprocessors
 ======================
 
-Repository for EE 2420 Microprocessors class with Dr. Stapleton. Dr. Stapleton 
+Repository for EE 3420 Microprocessors class with Dr. Stapleton. Dr. Stapleton 
 provided many, many subroutines for use in this course in conjunction with the 
 Dragon12 development boards by EVB Plus. They were placed on the flash memory. 
 Depending on the precise model and revision of the development board in use 
