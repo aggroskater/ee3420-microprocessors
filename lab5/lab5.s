@@ -35,7 +35,7 @@ BUFFER	DS.B 1
 ; length holds the duration to hold the tone. At least 40ms. More if
 ; dip indicates more.
 
-LENGTH	DS.B 1
+LENGTH	DS.W 1
 
 ; ROW_TONES holds the row period for each possible GETC_KEYPAD input.
 ; These values line up with KEYPAD_OPTS. We can get the duty 
@@ -125,8 +125,8 @@ GOTKEY:
 	JSR E_PWM
 
 	;hold tone for delay length
-	
-	DELAY_BY_MS #100
+
+	DELAY_BY_MS LENGTH
 
 	;repeat
 
@@ -172,15 +172,22 @@ LOAD_PWM_CH7:
 
 SET_DELAY:
 
+	PSHD			; save original state of A:B
 	MOVB PORTH,LENGTH	; put delay into length.
-	LDAA LENGTH
-	CMPA #40
+	LDD LENGTH
+	TFR A,B			; PORTH is originally in high bit. need to
+				; put in low half
+	LDAA #0			; and zero out upper half
+	CPD #40			; now compare will work
 	BLO TOOLOW		; if delay from dip is too low, set to 40
+	STD LENGTH		; delay way bigger than 40. store in length.
+	PULD			; restore original state of A:B
 	RTS
 
 TOOLOW:
-	LDAA #40
-	STAA LENGTH
+	LDD #40
+	STD LENGTH		; delay from dip was too low. set to 40.
+	PULD			; restore original state of A:B
 	RTS
 
 E_PWM:
