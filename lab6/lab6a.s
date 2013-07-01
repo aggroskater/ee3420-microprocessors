@@ -50,6 +50,13 @@ PROMPT_DELAY	DC.B "Please input the desired delay factor, N,",CR,LF
 		DC.B NULL
 	
 NEWLINE		DC.B CR,LF,NULL
+
+DEBUG_E_RTI	DC.B "Inside E_RTI.",CR,LF,NULL
+DEBUG_E_RTI_E	DC.B "Escaped E_RTI.",CR,LF,NULL
+DEBUG_ISR	DC.B "Inside ISR_STEPPER_STEP",CR,LF,NULL
+DEBUG_INFLOOP	DC.B "This should never happen.",CR,LF,NULL
+DEBUG_FSD	DC.B "Inside FSD label.",CR,LF,NULL
+DEBUG_ISR_END	DC.B "Inside ISR ending.",CR,LF,NULL
 	
 	ORG $2000
 
@@ -94,6 +101,7 @@ INITIALIZE:
 
 E_RTI:
 
+;	PUTS_SCI0 #DEBUG_E_RTI
 	MOVB #%10000000,CRGINT	; enables RTI
 	CLI			; permits global interrupts
 	RTS
@@ -110,6 +118,8 @@ ISR_STEPPER_STEP:
 
 	LDD COUNTER
 	DBNE D,ISR_END
+
+	PUTS_SCI0 #DEBUG_ISR
 	
 	;alright. time to move. what direction are we rotating?
 	LDAB ROTATION
@@ -128,6 +138,8 @@ ISR_GET_STEP_TYPE:
 	BEQ ISR_STEP_FSD
 	CMPB #'3'
 	BEQ ISR_STEP_HS	
+	PUTS_SCI0 #DEBUG_INFLOOP
+	BRA ISR_STEP_FSD
 
 ISR_ROT_CW:
 
@@ -164,8 +176,9 @@ ISR_STEP_FSS:
 ISR_STEP_FSD:
 
         ;perform the actual step based off increment
+	PUTS_SCI0 #DEBUG_FSD
         LDAB STEP_OFFSET
-        ADDB STEP_INCREMENT
+	ADDB STEP_INCREMENT
         ANDB #%00000011         ; this lets us go from 0 3 and roll back over.
         STAB STEP_OFFSET        ; this will increment from 1 to 3 before
                                 ; rolling back over to zero and repeating.
@@ -204,6 +217,7 @@ ISR_STEP_HS:
 ISR_END:
 
 	STD COUNTER
+	MOVB #%10000000,CRGFLG	;acknowledge that interrupt has executed.
 	RTI
 
 STEPPER_SETUP:
@@ -237,11 +251,11 @@ SET_STEP:
 	PUTS_SCI0 #PROMPT_STEPTYPE
 	GETC_SCI0
 	CMPB #'1'		; Full step single coil?
-	BEQ FSS
+	LBEQ FSS
 	CMPB #'2'		; Full step dual coil?
-	BEQ FSD
+	LBEQ FSD
 	CMPB #'3'		; Half step?
-	BEQ HS
+	LBEQ HS
 	PUTS_SCI0 #NEWLINE
 	BRA SET_STEP		; bad input
 
@@ -252,14 +266,18 @@ SET_DELAY:
 	GETS_SCI0 #DELAY_BUFFER
 	ATOI #DELAY_BUFFER,DELAY
 	LDD DELAY
-	CPD #10
+	CPD #0
 	BLO DELAY_RETRY		; input out of range. grab again.
-	CPD #255
+	CPD #20000
 	BHI DELAY_RETRY		; input out of range. grab again.
+	STD COUNTER		; ISR will decrement this until it hits zero
+				; before resetting it to delay
 
-
-	;JSR E_RTI		; enable RTI since state is well-defined.	
-	LBRA STEPPER_SETUP	; repeat forevah!
+	JSR E_RTI		; enable RTI since state is well-defined.	
+;	PUTS_SCI0 #DEBUG_E_RTI_E
+;	LBRA STEPPER_SETUP	; repeat forevah!
+ITSATRAP:
+	BRA ITSATRAP
 
 
 QUIT:
@@ -272,28 +290,28 @@ QUIT:
 
 CW:
 
-	MOVB #1,ROTATION
+	MOVB #'1',ROTATION
 	LBRA SET_STEP
 
 CCW:
 
-	MOVB #2,ROTATION
+	MOVB #'2',ROTATION
 	LBRA SET_STEP
 
 FSS:
 
-	MOVB #1,STEPTYPE
+	MOVB #'1',STEPTYPE
 	BRA SET_DELAY
 
 FSD:
 
-	MOVB #2,STEPTYPE
+	MOVB #'2',STEPTYPE
 	BRA SET_DELAY
 
 HS:
 
-	MOVB #3,STEPTYPE
-	BRA SET_DELAY
+	MOVB #'3',STEPTYPE
+	LBRA SET_DELAY
 
 DELAY_RETRY:
 
