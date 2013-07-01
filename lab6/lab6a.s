@@ -3,6 +3,11 @@
 ; this same code works if the motor is wired as bipolar or unipolar 
 ; 4 phase.
 
+; actually, i couldn't tell you whether it's different or not. I THOUGHT I had 
+; wired the motor as 4-phase unipolar, but Stapleton said it was wired as 
+; 4-phase bipolar. So I honestly don't know if this code is for bipolar,
+; unipolar, or both.
+
 #INCLUDE ../HC12TOOLS.INC
 
 	ORG $1000
