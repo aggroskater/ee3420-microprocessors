@@ -11,7 +11,7 @@ ROTATION	DS.B 1
 STEPTYPE	DS.B 1
 DELAY		DS.W 1
 DELAY_BUFFER	DS.B 20
-COUNT		DS.W 1
+COUNTER		DS.W 1
 
 FSS_SEQ	DC.B $00,$01,$02,$03
 
@@ -48,65 +48,17 @@ PROMPT_DELAY	DC.B "Please input the desired delay factor, N,",CR,LF
 		DC.B CR,LF
 		DC.B ">"
 		DC.B NULL
-		
+	
+NEWLINE		DC.B CR,LF,NULL
+	
 	ORG $2000
 
 MAIN:
 
 	JSR INITIALIZE
 	JSR E_RTI		; initially, we have CW, FSS, 1ms delay
-		
-START:
-
-	PUTS_SCI0 #PROMPT_START	; start main program loop
-	GETC_SCI0		; grab input from user. gets placed in B.
-	CMPB #'1'		; are we continuing?
-	BEQ SET_ROT
-	CMPB #'2'		; are we quiting?
-	BEQ QUIT
-	PUTS_SCI0 CR,LF,NULL
-	BRA START		; bad input. try again.
-
-SET_ROT:
-
-	;JSR D_RTI		; disable RTI until state is well-defined.
-	PUTS_SCI0 #PROMPT_ROTATION
-	GETC_SCI0
-	CMPB #'1'		; rotating clockwise?
-	BEQ CW
-	CMPB #'2'		; rotating counter clockwise?
-	BEQ CCW
-	PUTS_SCI0 CR,LF,NULL
-	BRA SET_ROT		; bad input. try again.
-
-SET_STEP:
-
-	PUTS_SCI0 #PROMPT_STEPTYPE
-	GETC_SCI0
-	CMPB #'1'		; Full step single coil?
-	BEQ FSS
-	CMPB #'2'		; Full step dual coil?
-	BEQ FSD
-	CMPB #'3'		; Half step?
-	BEQ HS
-	PUTS_SCI0 CR,LF,NULL
-	BRA SET_STEP		; bad input
-
-SET_DELAY:
-
-	PUTS_SCI0 #PROMPT_DELAY
-	GETS_SCI0 #DELAY_BUFFER
-	ATOI #DELAY_BUFFER,DELAY
-	LDD DELAY
-	CPD #10
-	BLO DELAY_RETRY		; input out of range. grab again.
-	CPD #255
-	BHI DELAY_RETRY		; input out of range. grab again.
-
-
-	;JSR E_RTI		; enable RTI since state is well-defined.	
-	BRA START		; repeat forevah!
-
+	JSR STEPPER_SETUP	; this is the main loop
+	
 ;----------------------------------------------------------
 ;-----------------   HELPER ROUTINES   --------------------
 ;----------------------------------------------------------
@@ -117,7 +69,7 @@ INITIALIZE:
 	;moment.
 	BSET DDRJ,#%00000010	; set jumper1 to output mode
 	BCLR PORTJ,#%00000010	; set jumper1 to output a low signal
-	MOVB DDRB,#%00001111	; will output on LEDs 3 through 0.
+	MOVB #%00001111,DDRB	; will output on LEDs 3 through 0.
 
 	;enable PORTP, which is where the motor driver chip gets its input.
 	MOVB #%00001111,DDRP	; Set PORTP as output (sends output to driver
@@ -254,6 +206,58 @@ ISR_END:
 	STD COUNTER
 	RTI
 
+STEPPER_SETUP:
+	
+	PUTS_SCI0 #PROMPT_START	; start main program loop
+	GETC_SCI0		; grab input from user. gets placed in B.
+	CMPB #'1'		; are we continuing?
+	BEQ SET_ROT
+	CMPB #'2'		; are we quiting?
+	LBEQ QUIT
+	PUTS_SCI0 #NEWLINE
+	BRA STEPPER_SETUP	; bad input. try again.
+
+SET_ROT:
+
+	JSR D_RTI		; disable RTI until state is well-defined.
+	PUTS_SCI0 #PROMPT_ROTATION
+	GETC_SCI0
+	CMPB #'1'		; rotating clockwise?
+	BEQ CW
+	CMPB #'2'		; rotating counter clockwise?
+	LBEQ CCW
+	PUTS_SCI0 #NEWLINE
+	BRA SET_ROT		; bad input. try again.
+
+SET_STEP:
+
+	PUTS_SCI0 #PROMPT_STEPTYPE
+	GETC_SCI0
+	CMPB #'1'		; Full step single coil?
+	BEQ FSS
+	CMPB #'2'		; Full step dual coil?
+	BEQ FSD
+	CMPB #'3'		; Half step?
+	BEQ HS
+	PUTS_SCI0 #NEWLINE
+	BRA SET_STEP		; bad input
+
+SET_DELAY:
+
+	PUTS_SCI0 #PROMPT_DELAY
+	GETS_SCI0 #DELAY_BUFFER
+	ATOI #DELAY_BUFFER,DELAY
+	LDD DELAY
+	CPD #10
+	BLO DELAY_RETRY		; input out of range. grab again.
+	CPD #255
+	BHI DELAY_RETRY		; input out of range. grab again.
+
+
+	JSR E_RTI		; enable RTI since state is well-defined.	
+	LBRA STEPPER_SETUP	; repeat forevah!
+
+
 QUIT:
 
 	CLR PORTB
@@ -289,5 +293,5 @@ HS:
 
 DELAY_RETRY:
 
-	PUTS_SCI0 CR,LF,NULL
+	PUTS_SCI0 #NEWLINE 
 	BRA SET_DELAY
