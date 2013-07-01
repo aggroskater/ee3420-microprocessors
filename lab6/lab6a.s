@@ -56,7 +56,7 @@ NEWLINE		DC.B CR,LF,NULL
 MAIN:
 
 	JSR INITIALIZE
-	JSR E_RTI		; initially, we have CW, FSS, 1ms delay
+;	JSR E_RTI		; initially, we have CW, FSS, 1ms delay
 	JSR STEPPER_SETUP	; this is the main loop
 	
 ;----------------------------------------------------------
@@ -207,7 +207,8 @@ ISR_END:
 	RTI
 
 STEPPER_SETUP:
-	
+
+	PUTS_SCI0 #NEWLINE	
 	PUTS_SCI0 #PROMPT_START	; start main program loop
 	GETC_SCI0		; grab input from user. gets placed in B.
 	CMPB #'1'		; are we continuing?
@@ -220,10 +221,11 @@ STEPPER_SETUP:
 SET_ROT:
 
 	JSR D_RTI		; disable RTI until state is well-defined.
+	PUTS_SCI0 #NEWLINE
 	PUTS_SCI0 #PROMPT_ROTATION
 	GETC_SCI0
 	CMPB #'1'		; rotating clockwise?
-	BEQ CW
+	LBEQ CW
 	CMPB #'2'		; rotating counter clockwise?
 	LBEQ CCW
 	PUTS_SCI0 #NEWLINE
@@ -231,6 +233,7 @@ SET_ROT:
 
 SET_STEP:
 
+	PUTS_SCI0 #NEWLINE
 	PUTS_SCI0 #PROMPT_STEPTYPE
 	GETC_SCI0
 	CMPB #'1'		; Full step single coil?
@@ -244,6 +247,7 @@ SET_STEP:
 
 SET_DELAY:
 
+	PUTS_SCI0 #NEWLINE
 	PUTS_SCI0 #PROMPT_DELAY
 	GETS_SCI0 #DELAY_BUFFER
 	ATOI #DELAY_BUFFER,DELAY
@@ -254,7 +258,7 @@ SET_DELAY:
 	BHI DELAY_RETRY		; input out of range. grab again.
 
 
-	JSR E_RTI		; enable RTI since state is well-defined.	
+	;JSR E_RTI		; enable RTI since state is well-defined.	
 	LBRA STEPPER_SETUP	; repeat forevah!
 
 
@@ -269,12 +273,12 @@ QUIT:
 CW:
 
 	MOVB #1,ROTATION
-	BRA SET_STEP
+	LBRA SET_STEP
 
 CCW:
 
 	MOVB #2,ROTATION
-	BRA SET_STEP
+	LBRA SET_STEP
 
 FSS:
 
@@ -294,4 +298,4 @@ HS:
 DELAY_RETRY:
 
 	PUTS_SCI0 #NEWLINE 
-	BRA SET_DELAY
+	LBRA SET_DELAY
