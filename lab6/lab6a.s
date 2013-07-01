@@ -1,5 +1,8 @@
 ; vim: set filetype=asmhc12:
 
+; this same code works if the motor is wired as bipolar or unipolar 
+; 4 phase stepping for full stepping. Half stepping is the only difference.
+
 #INCLUDE ../HC12TOOLS.INC
 
 	ORG $1000
@@ -13,10 +16,12 @@ DELAY		DS.W 1
 DELAY_BUFFER	DS.B 20
 COUNTER		DS.W 1
 
+
 FSS_SEQ	DC.B $08,$04,$02,$01
 
 FSD_SEQ	DC.B $0C,$06,$03,$09
 
+;bipolar half-stepping
 HS_SEQ	DC.B $08,$0C,$04,$06,$02,$03,$01,$09
 
 PROMPT_START	DC.B "Do you wish to update state or quit?",CR,LF
