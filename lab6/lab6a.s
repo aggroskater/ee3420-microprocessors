@@ -120,7 +120,7 @@ ISR_STEPPER_STEP:
 	LDD COUNTER
 	DBNE D,ISR_END
 
-	PUTS_SCI0 #DEBUG_ISR
+;	PUTS_SCI0 #DEBUG_ISR
 	
 	;alright. time to move. what direction are we rotating?
 	LDAB ROTATION
@@ -139,7 +139,7 @@ ISR_GET_STEP_TYPE:
 	BEQ ISR_STEP_FSD
 	CMPB #'3'
 	BEQ ISR_STEP_HS	
-	PUTS_SCI0 #DEBUG_INFLOOP
+;	PUTS_SCI0 #DEBUG_INFLOOP
 	BRA ISR_STEP_FSD
 
 ISR_ROT_CW:
@@ -157,7 +157,7 @@ ISR_ROT_CCW:
 ISR_STEP_FSS:
 
 	;perform the actual step based off increment
-	PUTS_SCI0 #DEBUG_FSS
+;	PUTS_SCI0 #DEBUG_FSS
 	LDAB STEP_OFFSET
 	ADDB STEP_INCREMENT
 	ANDB #%00000011		; this lets us go from 0 3 and roll back over.
@@ -178,7 +178,7 @@ ISR_STEP_FSS:
 ISR_STEP_FSD:
 
         ;perform the actual step based off increment
-	PUTS_SCI0 #DEBUG_FSD
+;	PUTS_SCI0 #DEBUG_FSD
         LDAB STEP_OFFSET
 	ADDB STEP_INCREMENT
         ANDB #%00000011         ; this lets us go from 0 3 and roll back over.
@@ -277,9 +277,9 @@ SET_DELAY:
 
 	JSR E_RTI		; enable RTI since state is well-defined.	
 ;	PUTS_SCI0 #DEBUG_E_RTI_E
-;	LBRA STEPPER_SETUP	; repeat forevah!
-ITSATRAP:
-	BRA ITSATRAP
+	LBRA STEPPER_SETUP	; repeat forevah!
+;ITSATRAP:
+;	BRA ITSATRAP
 
 
 QUIT:
