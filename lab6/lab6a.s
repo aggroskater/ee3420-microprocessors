@@ -13,7 +13,7 @@ DELAY		DS.W 1
 DELAY_BUFFER	DS.B 20
 COUNTER		DS.W 1
 
-FSS_SEQ	DC.B $00,$01,$02,$03
+FSS_SEQ	DC.B $08,$04,$02,$01
 
 FSD_SEQ	DC.B $0C,$06,$03,$09
 
@@ -55,6 +55,7 @@ DEBUG_E_RTI	DC.B "Inside E_RTI.",CR,LF,NULL
 DEBUG_E_RTI_E	DC.B "Escaped E_RTI.",CR,LF,NULL
 DEBUG_ISR	DC.B "Inside ISR_STEPPER_STEP",CR,LF,NULL
 DEBUG_INFLOOP	DC.B "This should never happen.",CR,LF,NULL
+DEBUG_FSS	DC.B "Inside FSS label.",CR,LF,NULL
 DEBUG_FSD	DC.B "Inside FSD label.",CR,LF,NULL
 DEBUG_ISR_END	DC.B "Inside ISR ending.",CR,LF,NULL
 	
@@ -156,6 +157,7 @@ ISR_ROT_CCW:
 ISR_STEP_FSS:
 
 	;perform the actual step based off increment
+	PUTS_SCI0 #DEBUG_FSS
 	LDAB STEP_OFFSET
 	ADDB STEP_INCREMENT
 	ANDB #%00000011		; this lets us go from 0 3 and roll back over.
