@@ -20,14 +20,14 @@ PROMPT_SETUP	DC.B "Please indicate which action you desire:",CR,LF
 		DC.B ">"
 		DC.B NULL
 
-PROMPT_MIN	DC.B "Input minimum duty cycle, no less than 24, no",CR,LF
-		DC.B "greater than 96.",CR,LF
+PROMPT_MIN	DC.B "Input minimum duty cycle, no less than 36, no",CR,LF
+		DC.B "greater than 84.",CR,LF
 		DC.B CR,LF
 		DC.B ">"
 		DC.B NULL
 
-PROMPT_MAX	DC.B "Input maximum duty cycle, no greater than 96, no",CR,LF   
-                DC.B "less than 24.",CR,LF
+PROMPT_MAX	DC.B "Input maximum duty cycle, no greater than 84, no",CR,LF   
+                DC.B "less than 36.",CR,LF
                 DC.B CR,LF
                 DC.B ">"
                 DC.B NULL
@@ -85,16 +85,16 @@ MAIN:
 	MOVB #$02,PWMPRCLK ;PWM CLOCK A SCALE=4
 	MOVB #75,PWMSCLA ; SA = A/(2*75) = A / 150
 	MOVB #800,PWMPER4 ;PWM CHANNEL 4 PERIOD = 20ms
-	MOVB #24,PWMDTY4 ;PWM CHANNEL 4 DUTY CYCLE = 3%
+	MOVB #36,PWMDTY4 ;PWM CHANNEL 4 DUTY CYCLE = 3%
 
 	;set up LCD
 	LCD_SETUP
 	LCD_CURSOR 0,0
 
 	;set initial values
-	LDD #24
+	LDD #36
 	STD MINIMUM
-	LDD #96
+	LDD #84
 	STD MAXIMUM
 	LDD #4
 	STD INCREMENT
@@ -126,9 +126,9 @@ SET_MIN:
 	GETS_SCI0 #STR_BUFFER
 	ATOI #STR_BUFFER,INT_BUFFER
 	LDD INT_BUFFER
-	CPD #24
+	CPD #36
 	BLO SET_MIN			; min too low
-	CPD #96
+	CPD #84
 	BHI SET_MIN			; min too high
 	CPD MAXIMUM
 	BHI SET_MIN			; min can't exceed max
@@ -142,9 +142,9 @@ SET_MAX:
         GETS_SCI0 #STR_BUFFER
         ATOI #STR_BUFFER,INT_BUFFER
         LDD INT_BUFFER
-        CPD #24
+        CPD #36
         BLO SET_MAX                     ; max too low
-        CPD #96
+        CPD #84
         BHI SET_MAX                     ; min too high
         CPD MINIMUM
         BLO SET_MAX                     ; max can't be less than min
@@ -202,7 +202,7 @@ FR_CCW:
 
 S_CW:
 
-	;max duty is 96. can't exceed this
+	;max duty is 84. can't exceed this
 	LDAB PWMDTY4
 	CMPB #95
 	BHI PROMPT
@@ -218,7 +218,7 @@ S_CW:
 
 S_CCW:
 
-        ;max duty is 96. can't exceed this
+        ;max duty is 84. can't exceed this
         LDAB PWMDTY4
         CMPB #25 
         BLO PROMPT   
