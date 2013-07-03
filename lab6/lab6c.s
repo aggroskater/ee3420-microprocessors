@@ -77,7 +77,7 @@ MAIN:
 
 	; MAX = 84
 
-	BSET PWME,BIT4	;ENABLE PWM CHANNEL 4 ; PP4 outputs waveform
+;	BSET PWME,BIT4	;ENABLE PWM CHANNEL 4 ; PP4 outputs waveform
 ;	BCLR PWME,BIT4
 	BSET PWMPOL,BIT4 ;CHANNEL 4 ACTIVE HIGH
 	;BCLR PWMCLK,BIT4 ;CHANNEL 4 CLOCK A (0 = A or B ; 1 = SA or SB)
@@ -85,16 +85,19 @@ MAIN:
 	MOVB #$02,PWMPRCLK ;PWM CLOCK A SCALE=4
 	MOVB #75,PWMSCLA ; SA = A/(2*75) = A / 150
 	MOVB #800,PWMPER4 ;PWM CHANNEL 4 PERIOD = 20ms
-	MOVB #36,PWMDTY4 ;PWM CHANNEL 4 DUTY CYCLE = 3%
+	MOVB #40,PWMDTY4 ;PWM CHANNEL 4 DUTY CYCLE = 5%
+	BSET PWME,BIT4
 
 	;set up LCD
 	LCD_SETUP
 	LCD_CURSOR 0,0
 
 	;set initial values
-	LDD #36
+;	LDD #36
+	LDD #40
 	STD MINIMUM
-	LDD #84
+;	LDD #84
+	LDD #80
 	STD MAXIMUM
 	LDD #4
 	STD INCREMENT
@@ -126,9 +129,11 @@ SET_MIN:
 	GETS_SCI0 #STR_BUFFER
 	ATOI #STR_BUFFER,INT_BUFFER
 	LDD INT_BUFFER
-	CPD #36
+;	CPD #36
+	CPD #40
 	BLO SET_MIN			; min too low
-	CPD #84
+;	CPD #84
+	CPD #80
 	BHI SET_MIN			; min too high
 	CPD MAXIMUM
 	BHI SET_MIN			; min can't exceed max
@@ -142,9 +147,11 @@ SET_MAX:
         GETS_SCI0 #STR_BUFFER
         ATOI #STR_BUFFER,INT_BUFFER
         LDD INT_BUFFER
-        CPD #36
+;        CPD #36
+	CPD #40
         BLO SET_MAX                     ; max too low
-        CPD #84
+;        CPD #84
+	CPD #80
         BHI SET_MAX                     ; min too high
         CPD MINIMUM
         BLO SET_MAX                     ; max can't be less than min
@@ -185,18 +192,21 @@ PROMPT:
 
 FR_CW:
 
-	LDD MAXIMUM
-	PSHD
-	MOVB 1,SP,PWMDTY4
-	PULD
+	LDD #MAXIMUM
+;	PSHD
+;	MOVB 1,SP,PWMDTY4
+;	PULD
+	STAB PWMDTY4
 	JSR DISPLAY_LCD
 	BRA PROMPT	
 
 FR_CCW:
 
-	LDD MINIMUM
-	PSHD
-	MOVB 1,SP,PWMDTY4
+	LDD #MINIMUM
+;	PSHD
+;	MOVB 1,SP,PWMDTY4
+;	PULD
+	STAB PWMDTY4
 	JSR DISPLAY_LCD
 	BRA PROMPT
 
@@ -204,7 +214,8 @@ S_CW:
 
 	;max duty is 84. can't exceed this
 	LDAB PWMDTY4
-	CMPB #95
+;	CMPB #83
+	CMPB #80
 	BHI PROMPT
 	LDD INCREMENT
 	PSHD
@@ -220,7 +231,8 @@ S_CCW:
 
         ;max duty is 84. can't exceed this
         LDAB PWMDTY4
-        CMPB #25 
+;        CMPB #36
+	CMPB #40
         BLO PROMPT   
         LDD INCREMENT
         PSHD
